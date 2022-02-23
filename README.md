@@ -10,6 +10,8 @@ The library provides the following capabilities:
 - Integration Tests
 - RabbitMq Implementation
 
+see case study: https://github.com/egerpaulj/Microservice.Amqp/wiki
+
 ## Using the library
 
 ### Configuration
