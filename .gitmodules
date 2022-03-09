@@ -1,0 +1,3 @@
+[submodule "Serialization"]
+    path = Microservice.Serialization
+    url = https://github.com/egerpaulj/Microservice.Serialization.git
