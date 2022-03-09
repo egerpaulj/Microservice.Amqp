@@ -48,7 +48,9 @@ Amqp": {
     }
 }
 '''
+
 ### Usage
+
 The following are the key interfaces:
 - IPublisher: publishes message to the AMQP system
 - ISubscriber<T, R>: handles messages from the AMQP system (input T, output R - using the IHandler<T, R>)
@@ -83,9 +85,19 @@ subscriber.Start();
 '''
 
 ### Integration Tests
+
 Start RabbitMq (see docker example file: startRabbitMqDocker.sh) and update the configuration file (if not localhost).
 
+### Screenshot from the RabbitMq Management Console
+
+  ![Screenshot: RabbitMq Connections](/Documentation/amqp_connections.png)
+
+  ![Screenshot: RabbitMq Subscription to Queue](/Documentation/amqp_queuesubscribed.png)
+
+
+
 ## License
+
 Copyright (C) 2021  Paul Eger
 
 This program is free software: you can redistribute it and/or modify
