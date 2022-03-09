@@ -12,6 +12,20 @@ The library provides the following capabilities:
 
 see case study: https://github.com/egerpaulj/Microservice.Amqp/wiki
 
+**Note:** Contains git submodule 
+
+```
+git clone --recurse-submodules https://github.com/egerpaulj/Microservice.Amqp.git
+```
+
+OR
+
+```
+git clone https://github.com/egerpaulj/Microservice.Amqp.git
+git submodule init
+git submodule update
+```
+
 ## Using the library
 
 ### Configuration
