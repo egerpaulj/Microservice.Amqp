@@ -59,7 +59,7 @@ namespace Microservice.Amqp.Rabbitmq
                     Context = context
                 };
 
-                return await Task.FromResult(new MessagePublisher(publisherConfig, _rabbitMqConnectionFactory));
+                return await Task.FromResult(new MessagePublisher(publisherConfig, _rabbitMqConnectionFactory, _converterProvider));
             }));
         }
 

@@ -110,7 +110,7 @@ namespace Microservice.Amqp.Rabbitmq
             try
             {
                 var resultStr = Encoding.UTF8.GetString(ea.Body.ToArray());
-                var result = JsonConvert.DeserializeObject<T>(resultStr, _jsonConverterProvider.GetJsonConverters());
+                var result = _jsonConverterProvider.Deserialize<T>(resultStr);
 
                 var message = new Message<T>
                 {

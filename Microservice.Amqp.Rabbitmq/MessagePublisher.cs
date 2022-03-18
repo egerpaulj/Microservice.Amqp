@@ -1,16 +1,16 @@
 //      Microservice AMQP Libraries for .Net C#                                                                                                                                       
 //      Copyright (C) 2021  Paul Eger                                                                                                                                                                     
-                                                                                                                                                                                                                   
+
 //      This program is free software: you can redistribute it and/or modify                                                                                                                                          
 //      it under the terms of the GNU General Public License as published by                                                                                                                                          
 //      the Free Software Foundation, either version 3 of the License, or                                                                                                                                             
 //      (at your option) any later version.                                                                                                                                                                           
-                                                                                                                                                                                                                   
+
 //      This program is distributed in the hope that it will be useful,                                                                                                                                               
 //      but WITHOUT ANY WARRANTY; without even the implied warranty of                                                                                                                                                
 //      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                                                                                                                                                 
 //      GNU General Public License for more details.                                                                                                                                                                  
-                                                                                                                                                                                                                   
+
 //      You should have received a copy of the GNU General Public License                                                                                                                                             
 //      along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Text;
 using LanguageExt;
 using Microservice.Amqp.Rabbitmq.Configuration;
+using Microservice.Serialization;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 
@@ -29,9 +30,11 @@ namespace Microservice.Amqp.Rabbitmq
         private readonly RabbitMqPublisherConfig _config;
         private readonly string _routingKey;
         private readonly IConnectionFactory _connectionFactory;
+        private readonly IJsonConverterProvider _jsonConverterProvider;
 
-        public MessagePublisher(RabbitMqPublisherConfig rabbitmqConfig, IRabbitMqConnectionFactory connectionFactory)
+        public MessagePublisher(RabbitMqPublisherConfig rabbitmqConfig, IRabbitMqConnectionFactory connectionFactory, IJsonConverterProvider jsonConverterProvider)
         {
+            _jsonConverterProvider = jsonConverterProvider;
             _config = rabbitmqConfig;
             _routingKey = _config.RoutingKey.Match(r => r, () => string.Empty);
 
@@ -85,7 +88,7 @@ namespace Microservice.Amqp.Rabbitmq
                     false,
                     properties,
                     Encoding.UTF8.GetBytes(
-                        JsonConvert.SerializeObject(
+                        _jsonConverterProvider.Serialize(
                             message.Payload.Match(p => p, () => throw new Exception("Not allowed to publish a message without a payload")))));
             }
 

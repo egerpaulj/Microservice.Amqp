@@ -17,6 +17,7 @@
 using System;
 using System.Threading.Tasks;
 using Microservice.Amqp.Rabbitmq.Configuration;
+using Microservice.Serialization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using RabbitMQ.Client;
@@ -47,7 +48,7 @@ namespace Microservice.Amqp.Rabbitmq.Test
 
             model.Setup(m => m.CreateBasicProperties()).Returns(Mock.Of<IBasicProperties>());
             
-            var testee = new MessagePublisher(rabbitmqConfig, connectionFactoryMock.Object);
+            var testee = new MessagePublisher(rabbitmqConfig, connectionFactoryMock.Object, new EmptyJsonConverterProvider());
             
             // ACT
             await testee.Publish<TestRequestMessage>(new TestRequestMessage{TestId = "Test Id"}).Match(r => {}, () => {});

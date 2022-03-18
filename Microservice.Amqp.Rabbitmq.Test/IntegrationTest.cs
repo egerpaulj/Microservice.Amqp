@@ -34,15 +34,11 @@ namespace Amqp.IntegrationTest
         private AmqpProvider _amqpProvider;
         private AmqpBootstrapper _amqpBootstrapper;
         private Task<IMessagePublisher> _publisher;
-        private Mock<IJsonConverterProvider> _jsonConverterProviderMock;
-
         public IntegrationTest()
         {
             var configuration = Microservice.TestHelper.TestHelper.GetConfiguration();
 
-            _jsonConverterProviderMock = new Mock<IJsonConverterProvider>();
-
-            _amqpProvider = new AmqpProvider(configuration, _jsonConverterProviderMock.Object, new RabbitMqConnectionFactory());
+            _amqpProvider = new AmqpProvider(configuration, new EmptyJsonConverterProvider(), new RabbitMqConnectionFactory());
             _amqpBootstrapper = new AmqpBootstrapper(configuration);
 
             _publisher = _amqpProvider.GetPublisher("CrawlRequest").Match(p => p, () => throw new System.Exception("Publisher missing"));
