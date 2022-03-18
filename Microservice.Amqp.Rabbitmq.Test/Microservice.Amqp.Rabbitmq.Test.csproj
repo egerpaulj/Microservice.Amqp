@@ -30,6 +30,7 @@
     <ProjectReference Include="..\Microservice.Serialization\Microservice.Serialization.csproj" />
     <ProjectReference Include="..\Microservice.Amqp\Microservice.Amqp.csproj" />
     <ProjectReference Include="..\Microservice.Amqp.Rabbitmq\Microservice.Amqp.Rabbitmq.csproj" />
+    <ProjectReference Include="..\Microservice.TestHelper\Microservice.TestHelper.csproj" />
   </ItemGroup>
 
   <ItemGroup>

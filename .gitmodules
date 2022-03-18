@@ -1,3 +1,6 @@
 [submodule "Microservice.Serialization"]
 	path = Microservice.Serialization
 	url = https://github.com/egerpaulj/Microservice.Serialization.git
+[submodule "Microservice.TestHelper"]
+	path = Microservice.TestHelper
+	url = https://github.com/egerpaulj/Microservice.TestHelper.git

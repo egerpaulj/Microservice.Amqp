@@ -24,14 +24,13 @@ using Microservice.Amqp.Rabbitmq.Test;
 using Moq;
 using Microservice.Serialization;
 using Microservice.Amqp;
-using System.Reactive.Disposables;
-using System.Diagnostics;
 
 namespace Amqp.IntegrationTest
 {
     [TestClass]
     public class IntegrationTest
     {
+        private const int MillisecondsDelay = 300;
         private AmqpProvider _amqpProvider;
         private AmqpBootstrapper _amqpBootstrapper;
         private Task<IMessagePublisher> _publisher;
@@ -39,7 +38,7 @@ namespace Amqp.IntegrationTest
 
         public IntegrationTest()
         {
-            var configuration = TestHelper.GetConfiguration();
+            var configuration = Microservice.TestHelper.TestHelper.GetConfiguration();
 
             _jsonConverterProviderMock = new Mock<IJsonConverterProvider>();
 
@@ -62,6 +61,7 @@ namespace Amqp.IntegrationTest
         }
 
         [TestMethod]
+        [TestCategory("IntegrationTest")]
         public async Task TestObservable_When100MessagesPublished_Then100MessgesReceived()
         {
             // ARRANGE - Create a subcriber
@@ -81,7 +81,7 @@ namespace Amqp.IntegrationTest
             // ACT - Start consuming messages
             subscriber.Start();
 
-            await Task.Delay(300);
+            await Task.Delay(MillisecondsDelay);
 
             // ASSERT
             Assert.AreEqual(numberOfSentMessages, numberOfReceivedMessage);
@@ -89,6 +89,7 @@ namespace Amqp.IntegrationTest
 
 
         [TestMethod]
+        [TestCategory("IntegrationTest")]
         public async Task TestObservableFunc__When100MessagesPublished_WhenMessageIdContains4_ThenThrowError_ThenMessagesAreProcessed_ThenObservableIsNotCold()
         {
             // ARRANGE - Create a subcriber, Error on 4s
@@ -116,11 +117,12 @@ namespace Amqp.IntegrationTest
             // ACT - Start consuming messages
             subscriber.Start();
 
-            await Task.Delay(300);
+            await Task.Delay(MillisecondsDelay);
             Assert.AreEqual(numberOfSentMessages, numberOfReceivedMessage);
         }
 
         [TestMethod]
+        [TestCategory("IntegrationTest")]
         public async Task TestObservableAsync__When100MessagesPublished_WhenMessageIdContains4_ThenThrowError_ThenMessagesAreProcessed_ThenObservableIsNotCold()
         {
             // ARRANGE - Create a subcriber with a handler that errors on 4
@@ -148,11 +150,12 @@ namespace Amqp.IntegrationTest
             // ACT - Start consuming messages
             subscriber.Start();
 
-            await Task.Delay(300);
+            await Task.Delay(MillisecondsDelay);
             Assert.AreEqual(numberOfSentMessages, numberOfReceivedMessage);
         }
 
         [TestMethod]
+        [TestCategory("IntegrationTest")]
         public async Task TestObservableFunc__WhenMultipleSubscribers_ThenLoadSharedBetweenSubscribers()
         {
             // ARRANGE - Create "same" subcriber twice
@@ -188,11 +191,12 @@ namespace Amqp.IntegrationTest
             subscriber1.Start();
             subscriber2.Start();
 
-            await Task.Delay(300);
+            await Task.Delay(MillisecondsDelay);
             Assert.AreEqual(numberOfSentMessages, numberOfReceivedMessage + numberOfReceivedMessage2);
         }
 
         [TestMethod]
+        [TestCategory("IntegrationTest")]
         public async Task TestObservable_When100MessagesPublished_WhenMultipleObservables_ThenDoubleTheMessgesReceived()
         {
             // ARRANGE - Create a subcriber
@@ -215,13 +219,14 @@ namespace Amqp.IntegrationTest
             // ACT - Start consuming messages
             subscriber.Start();
 
-            await Task.Delay(600);
+            await Task.Delay(MillisecondsDelay * 3);
 
             // ASSERT
             Assert.AreEqual(numberOfSentMessages * 2, numberOfReceivedMessage);
         }
 
         [TestMethod]
+        [TestCategory("IntegrationTest")]
         public async Task TestObservable_When10MessagesPublished_WhenMessageReceived_WhenSecondObservable_WhenPublishedAgain_ThenMessagesReceived()
         {
             // ARRANGE - Create a subcriber
@@ -240,7 +245,7 @@ namespace Amqp.IntegrationTest
             
             // ACT - Start consuming messages
             subscriber.Start();
-            await Task.Delay(100);
+            await Task.Delay(MillisecondsDelay);
 
             // ASSERT
             Assert.AreEqual(numberOfSentMessages, numberOfReceivedMessage);
@@ -250,13 +255,14 @@ namespace Amqp.IntegrationTest
 
             // ACT - publish messages
             await Publish(numberOfSentMessages);
-            await Task.Delay(100);
+            await Task.Delay(MillisecondsDelay);
 
             // ASSERT
             Assert.AreEqual((numberOfSentMessages * 2) + numberOfSentMessages, numberOfReceivedMessage);
         }
 
         [TestMethod]
+        [TestCategory("IntegrationTest")]
         public async Task TestObserverNack_ThenSentToDeadletterQueue()
         {
             // ARRANGE - Create a subcriber with a handler that errors
@@ -298,7 +304,7 @@ namespace Amqp.IntegrationTest
             subscriberDeadletter.GetObservable().Subscribe(t => numberOfDeadletterMessage++);
             subscriberDeadletter.Start();
 
-            await Task.Delay(300);
+            await Task.Delay(MillisecondsDelay);
             Assert.AreEqual(0, numberOfReceivedMessage);
             Assert.AreEqual(numberOfSentMessages, numberOfDeadletterMessage);
         }

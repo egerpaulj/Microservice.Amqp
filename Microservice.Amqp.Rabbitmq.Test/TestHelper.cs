@@ -9,21 +9,6 @@ namespace Microservice.Amqp.Rabbitmq.Test
 {
     public class TestHelper
     {
-        internal static IConfigurationRoot GetConfiguration()
-        {
-            string environment = GetEnvironment();
-
-            return new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile($"appsettings.{environment}.json")
-            .Build();
-        }
-
-        internal static string GetEnvironment()
-        {
-            return Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
-        }
-
         internal static Mock<IRabbitMqConnectionFactory> GetConnectionFactoryMock(out Mock<IConnection> connection, out Mock<IModel> model)
         {
             var rabbitMqFactoryMock = new Mock<IRabbitMqConnectionFactory>();
