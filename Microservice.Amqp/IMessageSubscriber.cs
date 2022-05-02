@@ -51,6 +51,20 @@ namespace Microservice.Amqp
         /// </summary>
         IObservable<Either<R, Exception>> GetObservable();
 
+        /// <summary>
+        /// Gets an <see cref="IObservable"/> of the Queue. Messages are sent to the Observable-
+        /// <para>
+        /// Note: a Function is provided by the callee; to work on the message. </para>
+        /// <para> If the Message was successfully processed, then it is Positively Acknowledged; and is removed from the Queue
+        /// </para>
+        /// <para> If processing failed, then it is Negatively Acknowledged; and will be sent to the Deadletter Exchange.
+        /// </para>
+        /// <returns>
+        /// An Either => The expected type; if the work was successfull; or the Exception.
+        /// </returns>
+        /// </summary>
+        IObservable<Either<Message<R>, Exception>> GetMessageObservable();
+
         
          /// <summary>
         /// Start Consuming Messages from the Queue.

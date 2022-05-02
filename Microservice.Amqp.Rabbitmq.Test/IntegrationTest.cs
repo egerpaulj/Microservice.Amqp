@@ -266,8 +266,7 @@ namespace Amqp.IntegrationTest
                                                             "CrawlRequest",
                                                             MessageHandlerFactory.Create<TestRequestMessage, string>(t =>
                                                             {
-                                                                throw new Exception("Expected Test Exception");
-                                                                return string.Empty;
+                                                                return ThrowException();
                                                             }))
                                                         .Match(p => p, () => throw new System.Exception("Subscriber missing"), ex => throw ex);
             var numberOfSentMessages = 10;
@@ -303,6 +302,11 @@ namespace Amqp.IntegrationTest
             await Task.Delay(MillisecondsDelay);
             Assert.AreEqual(0, numberOfReceivedMessage);
             Assert.AreEqual(numberOfSentMessages, numberOfDeadletterMessage);
+        }
+
+        private static string ThrowException()
+        {
+            throw new Exception("Expected Test Exception");
         }
 
         private async Task<string> HandleMessage(TestRequestMessage message)

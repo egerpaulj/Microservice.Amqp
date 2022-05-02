@@ -47,44 +47,84 @@ namespace Microservice.Amqp.Rabbitmq
             .Bind((Func<string, TryOptionAsync<IMessagePublisher>>)(context => async () =>
             {
                 var amqpContext = GetContext(context);
+                var publisher = CreatePublisher(context, amqpContext, _configuration, _converterProvider, _rabbitMqConnectionFactory);
 
-                var publisherConfig = new RabbitMqPublisherConfig
-                {
-                    Host = _configuration.Host,
-                    VirtHost = _configuration.VirtHost,
-                    Username = _configuration.Username,
-                    Password = _configuration.Password,
-                    Exchange = amqpContext.Exchange,
-                    RoutingKey = amqpContext.RoutingKey,
-                    Context = context
-                };
-
-                return await Task.FromResult(new MessagePublisher(publisherConfig, _rabbitMqConnectionFactory, _converterProvider));
+                return await Task.FromResult(publisher);
             }));
+        }
+
+        public static MessagePublisher CreatePublisher(
+            string context, 
+            AmqpContextConfiguration amqpContext, 
+            RabbitmqConfig configuration, 
+            IJsonConverterProvider converterProvider, 
+            IRabbitMqConnectionFactory rabbitMqConnectionFactory)
+        {
+            var publisherConfig = CreatePublisherConfiguration(context, amqpContext, configuration);
+            return new MessagePublisher(publisherConfig, rabbitMqConnectionFactory, converterProvider);
+        }
+
+        public static RabbitMqPublisherConfig CreatePublisherConfiguration(string context, AmqpContextConfiguration amqpContext, RabbitmqConfig configuration)
+        {
+            return new RabbitMqPublisherConfig
+            {
+                Host =     configuration.Host,
+                VirtHost = configuration.VirtHost,
+                Username = configuration.Username,
+                Password = configuration.Password,
+                Exchange = amqpContext.Exchange,
+                RoutingKey = amqpContext.RoutingKey,
+                Context = context
+            };
         }
 
         public TryOptionAsync<IMessageSubscriber<T, R>> GetSubsriber<T, R>(Option<string> contextName, IMessageHandler<T, R> messageHandler)
         {
             return
             contextName.ToTryOptionAsync()
-            .Bind<string, IMessageSubscriber<T, R>>(context => async () =>
-               {
-                   var amqpContext = GetContext(context);
-                   var subscriberConfig = new RabbitMqSubscriberConfig
-                   {
-                       Host = _configuration.Host,
-                       VirtHost = _configuration.VirtHost,
-                       Username = _configuration.Username,
-                       Password = _configuration.Password,
-                       QueueName = amqpContext.QueueName,
-                   };
+            .Bind((Func<string, TryOptionAsync<IMessageSubscriber<T, R>>>)(context => async () =>
+            {
+                var amqpContext = GetContext(context);
+                var subscriber = CreateSubscriber(messageHandler, amqpContext, _configuration, _rabbitMqConnectionFactory, _converterProvider);
 
-                   return await Task.FromResult(new MessageSubscriber<T, R>(
-                                        subscriberConfig, 
-                                        _converterProvider, 
-                                        _rabbitMqConnectionFactory, 
-                                        messageHandler));
-               });
+                return await Task.FromResult(subscriber);
+            }));
+        }
+
+        public static MessageSubscriber<T, R> CreateSubscriber<T, R>(
+            IMessageHandler<T, R> messageHandler, 
+            AmqpContextConfiguration amqpContext,
+            RabbitmqConfig configuration,
+            IRabbitMqConnectionFactory rabbitMqConnectionFactory,
+            IJsonConverterProvider converterProvider)
+        {
+            var subscriberConfig = CreateSubscriberConfiguration(amqpContext, configuration);
+            return CreateSubscriber(messageHandler, subscriberConfig, converterProvider, rabbitMqConnectionFactory);
+        }
+
+        public static MessageSubscriber<T, R> CreateSubscriber<T, R>(
+                    IMessageHandler<T, R> messageHandler, 
+                    RabbitMqSubscriberConfig subscriberConfig,
+                    IJsonConverterProvider converterProvider,
+                    IRabbitMqConnectionFactory rabbitMqConnectionFactory)
+        {
+            return new MessageSubscriber<T, R>(
+                                                 subscriberConfig,
+                                                 converterProvider,
+                                                 rabbitMqConnectionFactory,
+                                                 messageHandler);
+        }
+
+        public static RabbitMqSubscriberConfig CreateSubscriberConfiguration(AmqpContextConfiguration amqpContext, RabbitmqConfig configuration)
+        {
+            return new RabbitMqSubscriberConfig
+            {
+                Host =     configuration.Host,
+                VirtHost = configuration.VirtHost,
+                Username = configuration.Username,
+                Password = configuration.Password,
+                QueueName = amqpContext.QueueName,
+            };
         }
 
         private AmqpContextConfiguration GetContext(string context)
@@ -99,7 +139,7 @@ namespace Microservice.Amqp.Rabbitmq
             return match;
         }
 
-        internal static RabbitmqConfig LoadRabbitmqConfiguration(IConfiguration configuration)
+        public static RabbitmqConfig LoadRabbitmqConfiguration(IConfiguration configuration)
         {
             var section = configuration
                                     .GetSection(AmqpConfiguration.AmqpConfigurationRoot)
@@ -109,7 +149,7 @@ namespace Microservice.Amqp.Rabbitmq
 
             if (section == null)
             {
-                throw new Exception("Configuraiton missing for AMQP RabbitMq Provider");
+                throw new Exception("Configuration missing for AMQP RabbitMq Provider");
             }
 
             return new RabbitmqConfig

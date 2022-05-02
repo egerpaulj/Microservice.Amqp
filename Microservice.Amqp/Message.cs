@@ -10,7 +10,20 @@ namespace Microservice.Amqp
     /// </summary>
     public class Message<T>
     {
+        /// <summary>
+        /// The Actual Data.
+        /// </summary>
         public Option<T> Payload { get; set; }
+
+        /// <summary>
+        /// A Unique Id of the message.
+        /// </summary>
+        public Option<Guid> Id { get; set; }
+
+        /// <summary>
+        /// The messages routing key.
+        /// </summary>
+        public Option<string> RoutingKey { get; set; }
 
         /// <summary>
         /// The CorrelationID of the Message that's specific to the requested operation(s).

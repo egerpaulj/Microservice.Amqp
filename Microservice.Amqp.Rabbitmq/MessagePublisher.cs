@@ -70,6 +70,7 @@ namespace Microservice.Amqp.Rabbitmq
             {
 
                 var corrId = message.CorrelationId.Match(c => c, () => Guid.NewGuid());
+                var id = message.Id.Match(c => c, () => Guid.NewGuid());
 
                 // Create Custom Properties for the message.
                 var properties = channel.CreateBasicProperties();
@@ -80,6 +81,7 @@ namespace Microservice.Amqp.Rabbitmq
                 properties.Timestamp = new AmqpTimestamp((Int32)(DateTime.UtcNow - DateTime.UnixEpoch).TotalSeconds);
                 properties.Headers = new Dictionary<string, object>();
                 properties.Headers.Add("RetryCount", message.RetryCount.Match(r => r, () => 0));
+                properties.Headers.Add("Id", Encoding.UTF8.GetBytes(id.ToString()));
                 message.Context.Match(c => properties.Headers.Add("Context", Encoding.UTF8.GetBytes(c)), () => { });
 
                 channel.BasicPublish(
