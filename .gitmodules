@@ -1,6 +1,10 @@
 [submodule "Microservice.Serialization"]
 	path = Microservice.Serialization
 	url = https://github.com/egerpaulj/Microservice.Serialization.git
+	branch = main
+	update = rebase
 [submodule "Microservice.TestHelper"]
 	path = Microservice.TestHelper
 	url = https://github.com/egerpaulj/Microservice.TestHelper.git
+	branch = main
+	update = rebase
